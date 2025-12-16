@@ -4,6 +4,6 @@ export type Sandbox = {
 };
 
 export type Context = {
-  sandboxId?: string;
+  getSandbox: () => Promise<Sandbox>;
 };
 
