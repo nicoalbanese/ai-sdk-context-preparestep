@@ -1,7 +1,7 @@
 import { tool } from "ai";
 import { z } from "zod";
 import { Context } from "./types";
-import { ERROR } from "./utils";
+import { getOrCreateSandboxId, getSandbox } from "./utils";
 
 export const tools = {
   readFile: tool({
@@ -11,10 +11,9 @@ export const tools = {
     }),
     execute: async ({ path }, { experimental_context }) => {
       const context = experimental_context as Context;
-      if (!context.sandboxId) {
-        return ERROR.NO_SANDBOX;
-      }
-      return `File ${path} contents`;
+      const sandboxId = await getOrCreateSandboxId(context);
+      const sandbox = getSandbox(sandboxId);
+      return sandbox.readFile(path);
     },
   }),
 };
