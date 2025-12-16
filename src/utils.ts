@@ -7,6 +7,7 @@ const createSandbox = async (): Promise<Sandbox> => {
   return {
     id,
     readFile: async (path: string) => {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       return `Contents of ${path} in Sandbox: ${id}`;
     },
   };
