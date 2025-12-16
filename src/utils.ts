@@ -1,11 +1,34 @@
 import { generateId } from "ai";
+import { Context, Sandbox } from "./types";
 
-export const createSandbox = async (): Promise<string> => {
+const createSandbox = async (): Promise<Sandbox> => {
   await new Promise((resolve) => setTimeout(resolve, 2000));
-  return generateId();
+  const id = generateId();
+  return {
+    id,
+    readFile: async (path: string) => {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      return `Contents of ${path} in Sandbox: ${id}`;
+    },
+  };
 };
 
-export const ERROR = {
-  NO_SANDBOX:
-    "Sandbox not yet instantiated. It will be initiated now, please call the tool again.",
+export const createContext = (): Context => {
+  let sandboxPromise: Promise<Sandbox> | null = null;
+
+  return {
+    getSandbox: async () => {
+      if (!sandboxPromise) {
+        sandboxPromise = (async () => {
+          try {
+            return await createSandbox();
+          } catch (err) {
+            sandboxPromise = null;
+            throw err;
+          }
+        })();
+      }
+      return sandboxPromise;
+    },
+  };
 };
